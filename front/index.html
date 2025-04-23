@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Projetos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background-color: white;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    form {
+      margin-top: 30px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Projetos</h1>
+
+  <table id="projetosTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Descrição</th>
+        <th>Data Início</th>
+        <th>Data Fim</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <form id="formProjeto">
+    <h2>Inserir Novo Projeto</h2>
+    <input type="text" id="descricao" placeholder="Descrição" required />
+    <input type="date" id="dataInicio" required />
+    <input type="date" id="dataFim" required />
+    <button type="submit">Salvar Projeto</button>
+  </form>
+
+  <script>
+    const API_URL = "http://172.17.117.253:8080/projetos";
+
+    async function carregarProjetos() {
+      const response = await fetch(`${API_URL}/todos`);
+      const projetos = await response.json();
+
+      const tbody = document.querySelector("#projetosTable tbody");
+      tbody.innerHTML = "";
+
+      projetos.forEach(p => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${p.id}</td>
+          <td>${p.descricao}</td>
+          <td>${p.dataInicio}</td>
+          <td>${p.dataFim}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.getElementById("formProjeto").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const projeto = {
+        descricao: document.getElementById("descricao").value,
+        dataInicio: document.getElementById("dataInicio").value,
+        dataFim: document.getElementById("dataFim").value
+      };
+
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(projeto)
+      });
+
+      if (response.ok) {
+        alert("Projeto inserido com sucesso!");
+        this.reset();
+        carregarProjetos();
+      } else {
+        alert("Erro ao salvar projeto!");
+      }
+    });
+
+
+    carregarProjetos();
+  </script>
+</body>
+</html>
